@@ -12,6 +12,8 @@ var cli = module.exports;
 var tinylr = require('tiny-lr');
 var livereloadPort = args.p || 35729;
 
+var watchEvents = args.c ? 'change' : 'all';
+
 var help = [
   'usage: tiny-lr-it [dirs]',
   '',
@@ -19,7 +21,8 @@ var help = [
   '',
   'options:',
   '  -h                  Display this help menu',
-  '  -p                  Desired port to start server on localhost'
+  '  -p                  Desired port to start server on localhost',
+  '  -c                  Watch changes only instead of all events'
 ];
 
 var printHelp = function printHelp() {
@@ -32,7 +35,8 @@ cli.start = function(dirs) {
   lr.listen(livereloadPort, function() {
     console.log('livereload listening on ' + livereloadPort + '...');
     var watchOpts = {persistent: true, ignoreInitial: true};
-    watch(dirs, watchOpts).on('all', function(event, path) {
+    watch(dirs, watchOpts).on(watchEvents, function(event, path) {
+      path = path || event;
       tinylr.changed(path);
     });
   });
